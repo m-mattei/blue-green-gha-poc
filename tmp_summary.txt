@@ -1,0 +1,33 @@
+## Shift traffic summary
+
+| requested | blue | green |
+|---:|---:|---:|
+| 100 | 33 | 67 |
+
+#!/usr/bin/env bash
+# zsh/bash-safe script to simulate writing to 
+SUMMARY_FILE=./tmp_summary.txt
+LOG_FILE=logs/shift_run.log
+
+mkdir -p "."
+
+SUMMARY_LINE=SUMMARY: requested=100 blue=33 green=67
+if [ -z "SUMMARY: requested=100 blue=33 green=67" ]; then
+  echo "**Shift summary:** (no summary found)" > "./tmp_summary.txt"
+  exit 0
+fi
+REQUESTED=100
+BLUE=33
+GREEN=67
+
+cat > "./tmp_summary.txt" <<EOF
+## Shift traffic summary
+
+| requested | blue | green |
+|---:|---:|---:|
+| 100 | 33 | 67 |
+
+Raw summary:
+``
+SUMMARY: requested=100 blue=33 green=67
+``

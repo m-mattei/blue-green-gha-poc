@@ -23,3 +23,25 @@ jobs:
         with:
           name: shift-logs
           path: logs/shift_run.log
+      - name: Publish shift summary to job summary
+        if: always()
+        run: |
+          SUMMARY_LINE=$(grep '^SUMMARY:' logs/shift_run.log | tail -n1 || true)
+          if [ -z "$SUMMARY_LINE" ]; then
+            echo "**Shift summary:** (no summary found)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            # parse into fields like requested=100 blue=33 green=67
+            REQUESTED=$(echo "$SUMMARY_LINE" | sed -E 's/.*requested=([0-9]+).*/\1/')
+            BLUE=$(echo "$SUMMARY_LINE" | sed -E 's/.*blue=([0-9]+).*/\1/')
+            GREEN=$(echo "$SUMMARY_LINE" | sed -E 's/.*green=([0-9]+).*/\1/')
+            echo "## Shift traffic summary" >> "$GITHUB_STEP_SUMMARY"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo "| requested | blue | green |" >> "$GITHUB_STEP_SUMMARY"
+            echo "|---:|---:|---:|" >> "$GITHUB_STEP_SUMMARY"
+            echo "| $REQUESTED | $BLUE | $GREEN |" >> "$GITHUB_STEP_SUMMARY"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Raw summary:' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "$SUMMARY_LINE" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
