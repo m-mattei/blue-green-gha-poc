@@ -15,6 +15,10 @@ echo "Building project..."
 mvn -q -DskipTests package
 
 echo "Starting BLUE (port 8081)"
+mkdir -p run logs
+
+LOGDIR="$ROOT/logs"
+
 DEPLOY_COLOR=BLUE VERSION=${BLUE_VERSION:-v2} PORT=8081 nohup java -cp target/classes com.example.bluegreen.App > logs/blue.log 2>&1 &
 BLUE_PID=$!
 echo $BLUE_PID > run/blue.pid
