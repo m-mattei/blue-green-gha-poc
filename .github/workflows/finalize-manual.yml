@@ -11,6 +11,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Make scripts executable
         run: chmod +x scripts/*.sh
+      - name: Ensure run and logs dirs
+        run: mkdir -p logs run
       - name: Finalize (stop GREEN, leave BLUE running)
         run: |
           ./scripts/stop-instances.sh || true

@@ -16,6 +16,7 @@ jobs:
         run: chmod +x scripts/*.sh
       - name: Shift traffic
         run: |
+          mkdir -p logs run
           ./scripts/shift_traffic.sh ${{ github.event.inputs.percent_to_blue }} 100 > logs/shift_run.log || true
       - name: Upload shift logs
         uses: actions/upload-artifact@v4

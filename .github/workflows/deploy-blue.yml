@@ -16,6 +16,8 @@ jobs:
           java-version: '11'
       - name: Make scripts executable
         run: chmod +x scripts/*.sh
+      - name: Ensure run and logs dirs
+        run: mkdir -p logs run
       - name: Build
         run: mvn -B -DskipTests package || true
       - name: Start instances (BLUE/GREEN)
