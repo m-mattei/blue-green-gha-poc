@@ -1,0 +1,23 @@
+name: Finalize deployment (manual)
+
+on:
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+      - name: Finalize (stop GREEN, leave BLUE running)
+        run: |
+          ./scripts/stop-instances.sh || true
+      - name: Upload finalize status
+        run: |
+          echo '{"status":"finalized","finalized_at":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"'}' > finalize-status.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finalize-status
+          path: finalize-status.json

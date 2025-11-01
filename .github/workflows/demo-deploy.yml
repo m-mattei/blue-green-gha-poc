@@ -1,0 +1,35 @@
+name: Demo Blue-Green Deploy (Simulated)
+
+on:
+  workflow_dispatch:
+    inputs:
+      percent_to_blue:
+        description: 'Percentage of traffic to shift to BLUE'
+        required: false
+        default: '30'
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+      - name: Build
+        run: mvn -B -DskipTests package || true
+      - name: Start instances (simulated)
+        run: ./scripts/run-instances.sh
+      - name: Shift traffic
+        run: ./scripts/shift_traffic.sh ${{ github.event.inputs.percent_to_blue }} 100 > logs/demo_shift.log || true
+      - name: Upload demo logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-logs
+          path: logs/demo_shift.log
+      - name: Stop instances
+        run: ./scripts/stop-instances.sh || true

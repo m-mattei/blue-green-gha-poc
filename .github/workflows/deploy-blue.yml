@@ -1,0 +1,29 @@
+name: Deploy BLUE (start services, 0% traffic)
+
+on:
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  deploy-blue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+      - name: Build
+        run: mvn -B -DskipTests package || true
+      - name: Start instances (BLUE/GREEN)
+        run: ./scripts/run-instances.sh
+      - name: Upload status
+        run: |
+          echo '{"status":"deployed","blue_traffic":0}' > deploy-blue-status.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deploy-blue-status
+          path: deploy-blue-status.json

@@ -1,0 +1,33 @@
+name: Demo Sequence (Simulated)
+
+on:
+  workflow_dispatch:
+    inputs:
+      percentages:
+        description: 'Comma-separated percentages to shift to BLUE (e.g. 10,30,60)'
+        required: false
+        default: '10,30,60'
+
+jobs:
+  run-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+      - name: Build
+        run: mvn -B -DskipTests package || true
+      - name: Run demo sequence
+        run: |
+          IFS=',' read -ra PS <<< "${{ github.event.inputs.percentages }}"
+          ./scripts/demo_sequence.sh "${PS[@]}"
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-sequence-logs
+          path: logs/
